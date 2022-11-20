@@ -7,12 +7,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 describe('HeroService', () => {
   let service: HeroService;
-  let httpClientSpy: {post: jasmine.Spy, get: jasmine.Spy, put: jasmine.Spy}
+  let httpClientSpy: {post: jasmine.Spy, get: jasmine.Spy, put: jasmine.Spy, delete: jasmine.Spy}
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
     // service = TestBed.inject(HeroService);
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post','put']);
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post','put','delete']);
     service = new HeroService(<any> httpClientSpy);
   });
 
@@ -43,9 +43,9 @@ describe('HeroService', () => {
       statusText: "Not Found"
     });
 
-    httpClientSpy.get.and.returnValue(of(error404));
+    httpClientSpy.get.and.returnValue(throwError(error404));
   
-    service.getById().subscribe((result : Hero) =>{
+    service.getById(1).subscribe((result : Hero) =>{
       
     },
     (error: any) =>{
@@ -87,7 +87,7 @@ describe('HeroService', () => {
 
     httpClientSpy.put.and.returnValue(of(update));
 
-    service.update(update,1).subscribe((result : Hero) =>{
+    service.update(update).subscribe((result : Hero) =>{
       expect(result).toEqual(update);
       done();
     });
@@ -95,10 +95,10 @@ describe('HeroService', () => {
 
   it('Delete hero',(done: DoneFn) =>{
 
-    httpClientSpy.post.and.returnValue(of(null));
+    httpClientSpy.delete.and.returnValue(of([]));
 
     service.delete(1).subscribe((result : any) =>{
-      expect(result).toBeNull();
+      expect(result).toEqual([]);
       done();
     });
   })
@@ -128,7 +128,7 @@ describe('HeroService', () => {
 
     httpClientSpy.get.and.returnValue(of(null));
   
-    service.findWithString().subscribe((result : Hero[]) =>{
+    service.findWithString('MAN').subscribe((result : Hero[]) =>{
       expect(result).toBeNull();
       done();
     });

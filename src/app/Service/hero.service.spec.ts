@@ -2,8 +2,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { HeroService } from './hero.service';
 import { Hero } from 'src/app/Model/Hero';
-import { ResponseApi } from '../Model/ResponseApi';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 describe('HeroService', () => {
   let service: HeroService;
@@ -23,14 +23,14 @@ describe('HeroService', () => {
   it('return all heroes', (done: DoneFn) => {
 
     const heroesList: Hero[] = [
-      {id: 1, name: 'SPIDERMAN',city: 'NEW YORK', realName: 'PETER PARKER'},
-      {id: 2, name: 'SUPERMAN',city: 'NEW YORK', realName: 'CLARK KENT'}
+      {id: 1, name: 'SPIDERMAN',city: 'NEW YORK'},
+      {id: 2, name: 'SUPERMAN',city: 'NEW YORK'}
     ];
-    const response : ResponseApi = {data: heroesList, success: true , message: ''};
-    httpClientSpy.get.and.returnValue(of(response));
+
+    httpClientSpy.get.and.returnValue(of(heroesList));
   
-    service.getAll().suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
+    service.getAll().subscribe((result : Hero[]) =>{
+      expect(result).toEqual(heroesList);
       done();
     });
 
@@ -38,11 +38,18 @@ describe('HeroService', () => {
 
   it('not found heroes',(done: DoneFn) =>{
 
-    const response : ResponseApi = {data: null, success: false , message: 'Not found Heroes',error: '404 NOT FOUND'};
-    httpClientSpy.get.and.returnValue(of(response));
+    const error404 =new HttpErrorResponse({
+      status: 404,
+      statusText: "Not Found"
+    });
+
+    httpClientSpy.get.and.returnValue(of(error404));
   
-    service.getAll().suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
+    service.getById().subscribe((result : Hero) =>{
+      
+    },
+    (error: any) =>{
+      expect(error.status).toEqual(404);
       done();
     });
 
@@ -50,85 +57,79 @@ describe('HeroService', () => {
 
   it('Return hero with id = 1', (done: DoneFn) =>{
 
-    const heroExpected: Hero = {id: 1, name: 'SPIDERMAN',city: 'NEW YORK', realName: 'PETER PARKER'};
-    const response: ResponseApi = {data: heroExpected, success: true, message: ''}; 
-    httpClientSpy.get.and.returnValue(of(response));
+    const heroExpected: Hero = {id: 1, name: 'SPIDERMAN',city: 'NEW YORK'};
+    httpClientSpy.get.and.returnValue(of(heroExpected));
 
-    service.getById(1).suscribe((result: ResponseApi) =>{
-      expect(result).toEqual(response);
+    service.getById(1).subscribe((result: Hero) =>{
+      expect(result).toEqual(heroExpected);
       done();
     });
 
   });
-
-  it('not found heroes',(done: DoneFn) =>{
-    const response : ResponseApi = {data: null, success: false , message: 'Not found Heroe with id = 1',error: '404 NOT FOUND'};
-    httpClientSpy.get.and.returnValue(of(response));
-  
-    service.getById(1).suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
-      done();
-    });
-
-  });
-
 
   it('Create hero',(done: DoneFn) =>{
-    const hero: Hero = {id: 1, name: 'SPIDERMAN',city: 'NEW YORK', realName: 'PETER PARKER'};
-    const response: ResponseApi = {success: true, message: 'Created'};
-    httpClientSpy.post.and.returnValue(of(response));
 
-    service.create(hero).suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
+    const heroSend: Hero = {name: 'SPIDERMAN',city: 'NEW YORK'};
+
+    const hero: Hero = {id: 1, name: 'SPIDERMAN',city: 'NEW YORK'};
+
+    httpClientSpy.post.and.returnValue(of(hero));
+
+    service.create(heroSend).subscribe((result : Hero) =>{
+      expect(result).toEqual(hero);
       done();
     });
   });
 
+
   it('Update hero', (done: DoneFn) =>{
-    const update: Hero = {id: 1, name: 'SPIDERMAN',city : 'MANHATTAN', realName: 'PETER PARKER'};
+    const update: Hero = {id: 1, name: 'SPIDERMAN',city : 'MANHATTAN'};
 
-    const response: ResponseApi = {success: true, message: 'Updated'};
-    httpClientSpy.put.and.returnValue(of(response));
+    httpClientSpy.put.and.returnValue(of(update));
 
-    service.update(update).suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
+    service.update(update,1).subscribe((result : Hero) =>{
+      expect(result).toEqual(update);
       done();
     });
   });
 
   it('Delete hero',(done: DoneFn) =>{
-    
-    const response: ResponseApi = {success: true, message: 'Deleted'};
 
-    httpClientSpy.post.and.returnValue(of(response));
+    httpClientSpy.post.and.returnValue(of(null));
 
-    service.delete(1).suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
+    service.delete(1).subscribe((result : any) =>{
+      expect(result).toBeNull();
       done();
     });
   })
 
-  it('Find all heroes with cotains a specific string',(done: DoneFn) =>{
+  it('Find all heroes with name cotains a specific string',(done: DoneFn) =>{
 
-    const heroes: Hero[] =[];
+    const heroes: Hero[] =[{
+      "id": 1,
+      "name": "SPIDERMAN",
+      "city": "NEW YORK"
+    },
+    {
+      "id": 2,
+      "name": "SUPERMAN",
+      "city": "NEW YORK"
+    }];
 
-    const response: ResponseApi = {success: true, data: heroes};
+    httpClientSpy.get.and.returnValue(of(heroes));
 
-    httpClientSpy.get.and.returnValue(of(response));
-
-    service.findWithString('').suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
+    service.findWithString('MAN').subscribe((result : Hero[]) =>{
+      expect(result).toEqual(heroes);
       done();
     });
   });
 
   it('not found heroes with contains a specific string ',(done: DoneFn) =>{
 
-    const response : ResponseApi = {data: null, success: false , message: 'Not found Heroes',error: '404 NOT FOUND'};
-    httpClientSpy.get.and.returnValue(of(response));
+    httpClientSpy.get.and.returnValue(of(null));
   
-    service.findWithString().suscribe((result : ResponseApi) =>{
-      expect(result).toEqual(response);
+    service.findWithString().subscribe((result : Hero[]) =>{
+      expect(result).toBeNull();
       done();
     });
 

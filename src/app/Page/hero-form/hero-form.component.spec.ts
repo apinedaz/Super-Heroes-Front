@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormBuilder, FormControl, FormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule} from '@angular/forms';
 
 import { HeroFormComponent } from './hero-form.component';
 
@@ -12,10 +12,11 @@ describe('HeroFormComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ HeroFormComponent ],
       imports: [ MatDialogModule,
-                  FormsModule ], 
+                FormsModule ], 
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {id : 1,name:  "SPIDERMAN", city: "NEW YORK" }
-     } ] }) 
+        { provide: MAT_DIALOG_DATA, useValue: {id : 1,name:  "SPIDERMAN", city: "NEW YORK" } },
+        { provide: FormBuilder}
+      ] }) 
     .compileComponents();
 
     fixture = TestBed.createComponent(HeroFormComponent);
@@ -38,13 +39,10 @@ describe('HeroFormComponent', () => {
 
   it('Fill form',() =>{
     component.mapData();
-
-    const form = new FormBuilder().group({
-      name : new FormControl('',{validators:[Validators.min(0), Validators.required]}),
-      city : new FormControl('',{validators: [Validators.min(0),Validators.required]})
-               });
-
-    expect(component.heroForm).toEqual(form);
+    const name = component.heroForm.get('name')?.value;
+    const city = component.heroForm.get('city')?.value;
+    expect(name).toEqual('SPIDERMAN');
+    expect(city).toEqual('NEW YORK');
   })
 
 

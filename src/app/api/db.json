@@ -1,19 +1,32 @@
 {
   "heroes": [
     {
-      "id": 1,
       "name": "SPIDERMAN",
-      "city": "NEW YORK"
+      "city": "NEW YORK",
+      "superpower": "SPIDER",
+      "realName": "PETER PARKER",
+      "id": 1
     },
     {
-      "id": 2,
       "name": "SUPERMAN",
-      "city": "NEW YORK"
+      "city": "NEW YORK",
+      "realName": "CLARK KENT",
+      "superpower": "ALIEN",
+      "id": 2
     },
     {
       "name": "BATMAN",
       "city": "GOTHAM CITY",
+      "realName": "BRUCE WAINE",
+      "superpower": "",
       "id": 3
+    },
+    {
+      "name": "WOLVERINE",
+      "city": "ALBERTA",
+      "superpower": "MUTANTE",
+      "realName": "LOGAN",
+      "id": 5
     }
   ]
 }

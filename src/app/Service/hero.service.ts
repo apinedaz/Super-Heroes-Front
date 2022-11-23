@@ -18,7 +18,7 @@ export class HeroService {
    }
 
    public update(hero: Hero): Observable<Hero>{
-    return this.http.put<Hero>(this.url,hero);
+    return this.http.put<Hero>(`${this.url}/${hero.id}`,hero);
    }
 
    public getAll():Observable<Hero[]>{

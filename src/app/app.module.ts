@@ -8,7 +8,7 @@ import { HeroComponent } from './Page/hero/hero.component';
 import { HeroFormComponent } from './Page/hero-form/hero-form.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,6 +19,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { UppercaseDirective } from './Directive/uppercase.directive';
 import { HeroEditComponent } from './Page/hero-edit/hero-edit.component';
+import { HeroLoadingInterceptorInterceptor } from './Interceptor/hero-loading-interceptor.interceptor';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,7 @@ import { HeroEditComponent } from './Page/hero-edit/hero-edit.component';
     ReactiveFormsModule,
     MatFormFieldModule
   ],
-  providers: [],
+  providers: [{provide: HTTP_INTERCEPTORS,useClass: HeroLoadingInterceptorInterceptor, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
